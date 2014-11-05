@@ -1,0 +1,14 @@
+coordinator:
+SH 0013A200
+SL 40B94F05
+ID 1111
+SC FFFF
+
+zigbee end device AT 1: 
+SH 0013A200
+SL 40B79FAF
+
+zigbee end device AT 2:
+ID 1111
+SH 0013A200
+SL 40B96E3B

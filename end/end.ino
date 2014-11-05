@@ -1,17 +1,10 @@
-#define IN_HOLE 2
-#define ON_BOARD 3
+#define IN_HOLEA 2
+#define ON_BOARDA 3
 #define SCORE 4
-#define TEST_BOARD 5
-#define TEST_HOLE 6
-#define TEST_SCORE 7
-#include <SoftwareSerial.h>
-boolean isInHole = false;
-boolean isOnBoard = false;
-int val = 0;
-char code[10];
-int bytesread = 0;
-#define rxPin 8
-#define txPin 9
+#define IN_HOLEB 5
+#define ON_BOARDB 6
+int scoreA = 0;
+int scoreB = 0;
 
 void setup()
 {
@@ -21,48 +14,67 @@ void setup()
   digitalWrite(IN_HOLE, HIGH);  
   pinMode(SCORE, INPUT);
   digitalWrite(SCORE, HIGH);
-  pinMode(TEST_HOLE, OUTPUT);
-  pinMode(TEST_BOARD, OUTPUT);
-  pinMode(TEST_SCORE, OUTPUT);
   Serial.begin(9600);
 }
 
 void loop()
 {
-  // RFID CODE
-  SoftwareSerial RFID = SoftwareSerial(rxPin,txPin); 
-  RFID.begin(2400);
-
-  if((val = RFID.read()) == 10)
-  {
-    isOnBoard = true;
-  } 
-  
-//  //REST OF CODE
-  if (!digitalRead(IN_HOLE)) {
-    isInHole = true;
+  // If in hole, figure out which team, add to score TODO: TALAL
+  if (false) {// in hole
+    if (false) {// team a
+      scoreA += 3;
+    } else { // team b
+      scoreB += 3;
+    }
   }
+
   // If score pressed
   if (!digitalRead(SCORE)) {
-      digitalWrite(TEST_SCORE, HIGH);
-    if (isOnBoard && isInHole) { // Both
-      Serial.print('A');
-      digitalWrite(TEST_HOLE, HIGH);
-      digitalWrite(TEST_BOARD, HIGH);
-      isInHole = false;
-      isOnBoard = false;
-    } else if (isOnBoard) { // on board
-      Serial.print('B');
-      digitalWrite(TEST_BOARD, HIGH);      
-      isOnBoard = false;
-    } else if (isInHole) { // in hole
-      Serial.print('H');
-      digitalWrite(TEST_HOLE, HIGH);      
-      isInHole = false;
-    }
+    // Get count of all on board TODO: ROB
+    sendScore();
     delay(1000);
-    digitalWrite(TEST_HOLE, LOW);
-    digitalWrite(TEST_BOARD, LOW);    
-    digitalWrite(TEST_SCORE, LOW);
+    reset();
   }
+}
+
+void sendScore() {
+  if (scoreA = 0) {
+    Serial.print('A');
+  } else if (scoreA = 1) {
+    Serial.print('B');
+  } else if (scoreA = 2) {
+    Serial.print('C');
+  } else if (scoreA = 3) {
+    Serial.print('D');
+  } else if (scoreA = 4) {
+    Serial.print('E');
+  } else if (scoreA = 5) {
+    Serial.print('F');
+  } else if (scoreA = 6) {
+    Serial.print('G');
+  } else if (scoreA = 7) {
+    Serial.print('H');
+  }
+  if (scoreB = 0) {
+    Serial.print('A');
+  } else if (scoreB = 1) {
+    Serial.print('B');
+  } else if (scoreB = 2) {
+    Serial.print('C');
+  } else if (scoreB = 3) {
+    Serial.print('D');
+  } else if (scoreB = 4) {
+    Serial.print('E');
+  } else if (scoreB = 5) {
+    Serial.print('F');
+  } else if (scoreB = 6) {
+    Serial.print('G');
+  } else if (scoreB = 7) {
+    Serial.print('H');
+  }
+}
+
+void reset() {
+  scoreA = 0;
+  scoreB = 0;
 }
