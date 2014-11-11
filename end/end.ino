@@ -8,10 +8,14 @@ int scoreB = 0;
 
 void setup()
 {
-  pinMode(ON_BOARD, INPUT);
-  digitalWrite(ON_BOARD, HIGH);
-  pinMode(IN_HOLE, INPUT);
-  digitalWrite(IN_HOLE, HIGH);  
+  pinMode(ON_BOARDA, INPUT);
+  digitalWrite(ON_BOARDA, HIGH);
+  pinMode(IN_HOLEA, INPUT);
+  digitalWrite(IN_HOLEA, HIGH);  
+  pinMode(ON_BOARDB, INPUT);
+  digitalWrite(ON_BOARDB, HIGH);
+  pinMode(IN_HOLEB, INPUT);
+  digitalWrite(IN_HOLEB, HIGH);
   pinMode(SCORE, INPUT);
   digitalWrite(SCORE, HIGH);
   Serial.begin(9600);
@@ -31,46 +35,40 @@ void loop()
   // If score pressed
   if (!digitalRead(SCORE)) {
     // Get count of all on board TODO: ROB
-    sendScore();
+    sendScore(scoreA);
+    sendScore(scoreB);
     delay(1000);
     reset();
   }
 }
 
-void sendScore() {
-  if (scoreA = 0) {
+void sendScore(int score) {
+  if (score = 0) {
     Serial.print('A');
-  } else if (scoreA = 1) {
+  } else if (score = 1) {
     Serial.print('B');
-  } else if (scoreA = 2) {
+  } else if (score = 2) {
     Serial.print('C');
-  } else if (scoreA = 3) {
+  } else if (score = 3) {
     Serial.print('D');
-  } else if (scoreA = 4) {
+  } else if (score = 4) {
     Serial.print('E');
-  } else if (scoreA = 5) {
+  } else if (score = 5) {
     Serial.print('F');
-  } else if (scoreA = 6) {
+  } else if (score = 6) {
     Serial.print('G');
-  } else if (scoreA = 7) {
+  } else if (score = 7) {
     Serial.print('H');
-  }
-  if (scoreB = 0) {
-    Serial.print('A');
-  } else if (scoreB = 1) {
-    Serial.print('B');
-  } else if (scoreB = 2) {
-    Serial.print('C');
-  } else if (scoreB = 3) {
-    Serial.print('D');
-  } else if (scoreB = 4) {
-    Serial.print('E');
-  } else if (scoreB = 5) {
-    Serial.print('F');
-  } else if (scoreB = 6) {
-    Serial.print('G');
-  } else if (scoreB = 7) {
-    Serial.print('H');
+  } else if (score = 8) {
+    Serial.print('I');
+  } else if (score = 9) {
+    Serial.print('J');
+  } else if (score = 10) {
+    Serial.print('K');
+  } else if (score = 11) {
+    Serial.print('L');
+  } else if (score = 12) {
+    Serial.print('M');
   }
 }
 
