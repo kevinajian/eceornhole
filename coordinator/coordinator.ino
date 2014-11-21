@@ -5,13 +5,14 @@
 #define DISPLAY_5 6 
 #define DISPLAY_6 7
 #define DISPLAY_7 8
-#define DISPLAY_tensA 9
+#define BUZZER 9
 #define DISPLAY_onesA 10
 #define DISPLAY_tensB 11
 #define DISPLAY_onesB 12
 #define WIN_A 13
 #define WIN_B A0
 #define RESET A1
+#define DISPLAY_tensA A2
 
 int incomingByte;         // a variable to read incoming serial data into
 int scoreA = 0;
@@ -51,6 +52,7 @@ void setup() {
   pinMode(WIN_B, OUTPUT);
   pinMode(RESET, INPUT);
   digitalWrite(RESET, HIGH);
+  pinMode(BUZZER, OUTPUT);
   // initialize serial communication:
   Serial.begin(9600);
 
@@ -66,15 +68,8 @@ void loop() {
       inData[index] = incomingByte;
       index++;
     }
-    Serial.println("index ");
-    Serial.println(index);
   }
-  if (index == 2) {
-    Serial.println("hello");
-    Serial.println("in A ");
-    Serial.println(inData[0]);
-    Serial.println("in B ");
-    Serial.println(inData[1]);    
+  if (index == 2) {  
     if (inData[0] > inData[1]) {
       scoreA += inData[0] - inData[1];
     } else if (inData[1] > inData[0]) {
@@ -89,18 +84,22 @@ void loop() {
 
 void displayScore() {
   tensA = scoreA/10;
-  digitalWrite(DISPLAY_tensA, HIGH);
-  displayDigit(tensA);
-  digitalWrite(DISPLAY_tensA, LOW);
+  if (tensA != 0) {
+    digitalWrite(DISPLAY_tensA, HIGH);
+    displayDigit(tensA);
+    digitalWrite(DISPLAY_tensA, LOW);  
+  }
   onesA = scoreA%10;
   digitalWrite(DISPLAY_onesA, HIGH);
   displayDigit(onesA);
   digitalWrite(DISPLAY_onesA, LOW);
 // display B
   tensB = scoreB/10;
-  digitalWrite(DISPLAY_tensB, HIGH);
-  displayDigit(tensB);
-  digitalWrite(DISPLAY_tensB, LOW);
+  if (tensB != 0) {
+    digitalWrite(DISPLAY_tensB, HIGH);
+    displayDigit(tensB);
+    digitalWrite(DISPLAY_tensB, LOW);
+  }
   onesB = scoreB%10;
   digitalWrite(DISPLAY_onesB, HIGH);
   displayDigit(onesB);
@@ -109,14 +108,15 @@ void displayScore() {
 
 void displayDigit(int digit) {
   String displayBits = getDisplayBits(digit);
-  for (int i=0; i< displayBits.length(); i++) {
+  for (int i=0; i < displayBits.length(); i++) {
     int c = displayBits.charAt(i);
     if (c == '1') {
       int pin = i + 2;
       digitalWrite(pin, LOW);
-      delay(1);
-      digitalWrite(pin, HIGH);
     }
+  }
+  for (int i=0; i < displayBits.length(); i++) {
+    digitalWrite(i+2, HIGH);
   }
 }
 
@@ -152,7 +152,7 @@ void checkWin() {
   } else if (scoreA >= 21 && scoreB >= 21) {
     if (scoreA > scoreB) {
       Awin();
-    } else {
+    } else if (scoreB > scoreA) {
       Bwin();
     }
   }
@@ -169,7 +169,11 @@ void Bwin() {
 }
 
 void reset() {
-  delay(2000);
+  tone(BUZZER, 50);
+  for (int i = 0; i < 5000; i++) {
+    displayScore();
+  }
+  noTone(BUZZER);
   scoreA = 0;
   scoreB = 0;
   digitalWrite(WIN_A, LOW);
@@ -182,4 +186,4 @@ void quickReset() {
   scoreA = 0;
   scoreB = 0;
   Serial.flush();
-}
+}  
