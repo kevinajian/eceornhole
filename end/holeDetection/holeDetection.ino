@@ -1,10 +1,6 @@
 #include <MFRC522.h>
 #include <SPI.h>
-#define NEN 3
-#define S0 4
-#define S1 5
-#define S2 6
-#define S3 7
+
 #define SCORE 8
 
 #define SS_PIN 10    //Arduino Uno
@@ -33,16 +29,6 @@ int scoreB = 0;
 
 void setup()
 {
-        pinMode(NEN, OUTPUT);  
-        pinMode(S0, OUTPUT); 
-        pinMode(S1, OUTPUT);  
-        pinMode(S2, OUTPUT);
-        pinMode(S3, OUTPUT);
-        digitalWrite(NEN, LOW);
-        digitalWrite(S0, HIGH);
-        digitalWrite(S1, HIGH);
-        digitalWrite(S2, HIGH);
-        digitalWrite(S3, HIGH);
         pinMode(SCORE, INPUT);
         digitalWrite(SCORE, HIGH);
         Serial.begin(9600);
@@ -116,12 +102,12 @@ void update_scores(byte tag[]){
   
   for(int i = 0; i < ARR_LEN; i++){
     if(!memcmp(tag, teamA[i], TAG_LEN) && !teamA_check[i]){
-      scoreA++;
+      scoreA += 3;
       teamA_check[i] = true;
       break;
     }
     else if(!memcmp(tag, teamB[i], TAG_LEN) && !teamB_check[i]){
-      scoreB++;
+      scoreB += 3;
       teamB_check[i] = true;
       break;
     }
@@ -130,72 +116,14 @@ void update_scores(byte tag[]){
   
 }
 
-void check_all_antennas() {
 
-  //CHCEK ANTENNA 15
-  digitalWrite(NEN, LOW);
-  digitalWrite(S0, HIGH);
-  digitalWrite(S1, HIGH);
-  digitalWrite(S2, HIGH);
-  digitalWrite(S3, HIGH);
-  delay(5);
-  check_and_dump();
-  //CHCEK ANTENNA 4
-  digitalWrite(NEN, LOW);
-  digitalWrite(S0, LOW);
-  digitalWrite(S1, LOW);
-  digitalWrite(S2, HIGH);
-  digitalWrite(S3, LOW);
-  delay(5);
-  check_and_dump();
-  //CHCEK ANTENNA 3
-  digitalWrite(NEN, LOW);
-  digitalWrite(S0, HIGH);
-  digitalWrite(S1, HIGH);
-  digitalWrite(S2, LOW);
-  digitalWrite(S3, LOW);
-  delay(5);
-  check_and_dump();
-  //CHCEK ANTENNA 2
-  digitalWrite(NEN, LOW);
-  digitalWrite(S0, LOW);
-  digitalWrite(S1, HIGH);
-  digitalWrite(S2, LOW);
-  digitalWrite(S3, LOW);
-  delay(5);
-  check_and_dump();
-  //CHCEK ANTENNA 1
-  digitalWrite(NEN, LOW);
-  digitalWrite(S0, HIGH);
-  digitalWrite(S1, LOW);
-  digitalWrite(S2, LOW);
-  digitalWrite(S3, LOW);
-  delay(5);
-  check_and_dump();
-  //CHECK ANTENNA 0
-  digitalWrite(NEN, LOW);
-  digitalWrite(S0, LOW);
-  digitalWrite(S1, LOW);
-  digitalWrite(S2, LOW);
-  digitalWrite(S3, LOW);
-  delay(5);
-  check_and_dump();
-}
 
 void loop()
 {
-  // If in hole, figure out which team, add to score TODO: TALAL
-  if (false) {// in hole
-    if (false) {// team a
-      scoreA += 3;
-    } else { // team b
-      scoreB += 3;
-    }
-  }
  
-  // If score pressed
+  check_and_dump();
+  // If score button pressed
   if (digitalRead(SCORE)) {
-    check_all_antennas();
     sendScore(scoreA);
     sendScore(scoreB);
     delay(1000);
