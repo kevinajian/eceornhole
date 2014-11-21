@@ -15,10 +15,12 @@
 #define ARR_LEN2 2
 
 byte teamA[ARR_LEN][TAG_LEN] = {{0xA4, 0xF2, 0x97, 0x09A}}; 
+boolean teamA_check[ARR_LEN];
 //A4 F2 97 9A
 //For easy copy/paste/type: {0x, 0x, 0x, 0x, 0x, 0x, 0x, 0x, 0x, 0x, 0x, 0x,  0x, 0x, 0x, 0x}
 
 byte teamB[ARR_LEN][TAG_LEN] = {{0xB7, 0xD3, 0xEA, 0xBE}};
+boolean teamB_check[ARR_LEN];
 //0x30, 0x08, 0x04, 0x00, 0x62, 0x63, 0x64, 0x65,  0x66, 0x67, 0x68, 0x69
 
 byte beanbags_detected[ARR_LEN*2][TAG_LEN] = {{0xAA, 0xAA, 0xAA, 0xAA}, {0xBB, 0xBB, 0xBB, 0xBB}};
@@ -41,10 +43,15 @@ void setup()
         digitalWrite(S1, HIGH);
         digitalWrite(S2, HIGH);
         digitalWrite(S3, HIGH);
-        mfrc522.PCD_Init();        // Init MFRC522 card
         pinMode(SCORE, INPUT);
         digitalWrite(SCORE, HIGH);
         Serial.begin(9600);
+        SPI.begin();
+        mfrc522.PCD_Init();        // Init MFRC522 card
+        for(int i = 0; i < ARR_LEN; i++){
+          teamA_check[i] = false;
+          teamB_check[i] = false;
+        }
 }
 
 void check_and_dump() {
@@ -62,14 +69,14 @@ void check_and_dump() {
         // Select one of the cards
         if ( ! mfrc522.PICC_ReadCardSerial())    return;
         
-        Serial.print("Card UID:");    //Dump UID
+        /*Serial.print("Card UID:");    //Dump UID
         for (byte i = 0; i < mfrc522.uid.size; i++) {
           Serial.print(mfrc522.uid.uidByte[i] < 0x10 ? " 0" : " ");
           Serial.print(mfrc522.uid.uidByte[i], HEX);
         } 
-        Serial.print(" PICC type: ");   // Dump PICC type
+        Serial.print(" PICC type: ");   // Dump PICC type*/
         byte piccType = mfrc522.PICC_GetType(mfrc522.uid.sak);
-        Serial.println(mfrc522.PICC_GetTypeName(piccType));
+        //Serial.println(mfrc522.PICC_GetTypeName(piccType));
          
         byte buffer[18];  
         byte block  = 0;
@@ -89,54 +96,38 @@ void check_and_dump() {
 	    Serial.print("MIFARE_Read() failed: ");
 	    Serial.println(mfrc522.GetStatusCodeName(status));
 	}
-        else  // Dump data
-	for (byte index = 0; index < 16; index++) {
+        //else  // Dump data
+	/*for (byte index = 0; index < 16; index++) {
 	    Serial.print(buffer[index] < 0x10 ? " 0" : " ");
 	    Serial.print(buffer[index], HEX);
 	    if ((index % 4) == 3) Serial.print(" ");
 	}
-        Serial.println(" ");
+        Serial.println(" ");*/
         
-        determine_team(buffer);
+        update_scores(buffer);
         
         mfrc522.PICC_HaltA(); // Halt PICC
         mfrc522.PCD_StopCrypto1();  // Stop encryption on PCD
 }
 
-void determine_team(byte code[]){
-  boolean already_seen = false;
-  boolean team_a = false;
-  boolean team_b = false;
-  for(int i = 0; i < ARR_LEN; i++)
-   {
-     if(memcmp(code, beanbags_detected[i], TAG_LEN) == 0){
-         already_seen = true;
-       }
-     if(memcmp(code, teamA[i], TAG_LEN) == 0 )
-     {
-       team_a = true;
-       Serial.println("Team A.");
-     }
-     if(memcmp(code, teamB[i], TAG_LEN) == 0 )
-     {
-       team_b = true;
-       Serial.println("Team B.");
-     }
-   }
-   for(int i = ARR_LEN; i < ARR_LEN2; i++)
-   {
-     if(memcmp(code, beanbags_detected[i], TAG_LEN) == 0){
-         already_seen = true;
-       }
-   }
-   if (!already_seen) {
-     Serial.println("We have never seen this tag before!");
-     // SEND SCORE HERE!
-     for (byte index = 0; index < TAG_LEN; index++) {
-	    beanbags_detected[num_detected][index] = code[index];
-	}
-     num_detected++;
-   }
+//Determine the team for the rfid tag, ... 
+//then update score based on whether a tag has already been detected
+void update_scores(byte tag[]){
+  
+  for(int i = 0; i < ARR_LEN; i++){
+    if(!memcmp(tag, teamA[i], TAG_LEN) && !teamA_check[i]){
+      scoreA++;
+      teamA_check[i] = true;
+      break;
+    }
+    else if(!memcmp(tag, teamB[i], TAG_LEN) && !teamB_check[i]){
+      scoreB++;
+      teamB_check[i] = true;
+      break;
+    }
+    
+  }
+  
 }
 
 void check_all_antennas() {
@@ -201,15 +192,15 @@ void loop()
       scoreB += 3;
     }
   }
-  check_all_antennas();
+ 
   // If score pressed
-  /*if (digitalRead(SCORE)) {
+  if (digitalRead(SCORE)) {
     check_all_antennas();
     sendScore(scoreA);
     sendScore(scoreB);
     delay(1000);
     reset();
-  }*/
+  }
 }
 
 void sendScore(int score) {
