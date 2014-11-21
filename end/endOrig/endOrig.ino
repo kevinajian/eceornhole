@@ -3,7 +3,6 @@
 #define SCORE 4
 #define IN_HOLEB 5
 #define ON_BOARDB 6
-#define OFFSET 65
 int scoreA = 0;
 int scoreB = 0;
 
