@@ -3,7 +3,7 @@
 #define SCORE 4
 #define IN_HOLEB 5
 #define ON_BOARDB 6
-#define  offset  65
+#define OFFSET 65
 int scoreA = 0;
 int scoreB = 0;
 
@@ -34,7 +34,7 @@ void loop()
   }
 
   // If score pressed
-  if (!digitalRead(SCORE)) {
+  if (digitalRead(SCORE)) {
     // Get count of all on board TODO: ROB
     sendScore(scoreA);
     sendScore(scoreB);
@@ -44,7 +44,7 @@ void loop()
 }
 
 void sendScore(int score) {
-  score.char()
+  Serial.print(byte(score));
 }
 
 void reset() {
